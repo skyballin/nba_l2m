@@ -50,10 +50,10 @@ if __name__ == '__main__':
     nba_22_23 = 'https://official.nba.com/2022-23-nba-officiating-last-two-minute-reports/'
     nba_23_24 = 'https://official.nba.com/2023-24-nba-officiating-last-two-minute-reports/'
     soup = get_soup(nba_22_23)
-    links = get_links(soup)
+    expanded_links = get_links(soup)
     df = get_game_link_data(expanded_links)
     df.to_csv('../data/nba_22_23_l2m_metadata.csv', index=False)
     soup = get_soup(nba_23_24)
-    links = get_links(soup)
+    expanded_links = get_links(soup)
     df = get_game_link_data(expanded_links)
     df.to_csv('../data/nba_23_24_l2m_metadata.csv', index=False)
