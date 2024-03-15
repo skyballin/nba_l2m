@@ -46,14 +46,39 @@ def get_game_link_data(expanded_links):
     
     return df
 
+def main_metadata_pull(year):
+    y1 = year.split('_')[0]
+    y2 = year.split('_')[1]
+    nba_l2m = f'https://official.nba.com/20{y1}-{y2}-nba-officiating-last-two-minute-reports/'
+    soup = get_soup(nba_l2m)
+    expanded_links = get_links(soup)
+    df = get_game_link_data(expanded_links)
+    df.to_csv(f'../data/nba_{year}_l2m_metadata.csv', index=False)
+    return "Success"
+
+def get_gamedata(year):
+    base_url = "https://official.nba.com/l2m/json/"
+    collection = []
+    df = pd.read_csv(f'../data/nba_{year}_l2m_metadata.csv', dtype=str)
+    for game_id in df['game_id'].unique():
+        print(game_id)
+        link = base_url+game_id+'.json'
+        response = requests.get(link)
+        response = response.json()
+        collection.append((game_id, link, response))
+    collection = pd.DataFrame(collection, columns = ['game_id', 'link', 'response'])
+    collection.to_csv(f'../data/nba_{year}_l2m_gamedata.csv', index=False)
+    return "Success"
+
+def main_gamedata_pull(year):
+    get_gamedata(year)    
+    return "Success"
+
+def main():
+    years = ['22_23', '23_24']
+    for year in years:
+        message = main_metadata_pull(year)
+        message = main_gamedata_pull(year)
+    return message
 if __name__ == '__main__':
-    nba_22_23 = 'https://official.nba.com/2022-23-nba-officiating-last-two-minute-reports/'
-    nba_23_24 = 'https://official.nba.com/2023-24-nba-officiating-last-two-minute-reports/'
-    soup = get_soup(nba_22_23)
-    expanded_links = get_links(soup)
-    df = get_game_link_data(expanded_links)
-    df.to_csv('../data/nba_22_23_l2m_metadata.csv', index=False)
-    soup = get_soup(nba_23_24)
-    expanded_links = get_links(soup)
-    df = get_game_link_data(expanded_links)
-    df.to_csv('../data/nba_23_24_l2m_metadata.csv', index=False)
+    print(main())
